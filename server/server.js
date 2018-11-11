@@ -77,6 +77,29 @@ app.patch('/todos/:id', (req,res) => {
     })
 })
 
+//POST /users
+app.post('/users', (req,res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save(body).then((result) => {
+
+        return user.generateAuthToken();
+
+
+        if(!result) {
+            res.status(400).send();
+        }
+        console.log('Successfully saved user', result)
+        res.status(200).send()
+    }).then((token) => {
+        res.header('x-auth', token).send(user)
+    }).catch((e) => {
+         console.log('Error occurred', e);
+         return res.status(400).send()
+    })
+})
+
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
 })
