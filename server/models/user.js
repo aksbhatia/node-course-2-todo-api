@@ -89,6 +89,38 @@ UserSchema.pre('save', function(next) {
     }
 } )
 
+UserSchema.statics.findByCredentials = function(email, password) {  
+    var User = this;
+    return User.findOne({
+        email
+    }).then((user) => {
+        if(!user) {
+            console.log('no user error')
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject) => {
+            console.log('found')
+
+            var hashedPassword = user.password;
+            console.log('hashedpass', hashedPassword)
+
+            bcrypt.compare(password, hashedPassword, (err, res) => {
+                console.log('Match Found', res )
+                if(res) {
+                    resolve(user)
+                }
+                else {
+                    reject(user)
+    
+            }
+        })
+    })
+}).catch((e) => {
+    console.log('Error')
+    res.status(400).send(e)
+})
+}
+
 
 var User = mongoose.model('User', UserSchema)
 
